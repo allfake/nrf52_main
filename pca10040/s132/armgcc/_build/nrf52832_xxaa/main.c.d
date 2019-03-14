@@ -114,8 +114,12 @@ _build/nrf52832_xxaa/main.c.o: ../../../main.c \
  ../../../../../../components/boards/pca10040.h \
  ../../../../../../components/libraries/button/app_button.h \
  ../../../../../../components/libraries/pwr_mgmt/nrf_pwr_mgmt.h \
- ../../../../../../modules/nrfx/hal/nrf_uart.h \
- ../../../../../../modules/nrfx/hal/nrf_uarte.h \
+ ../../../../../../integration/nrfx/legacy/nrf_drv_twi.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_twim.h \
+ ../../../../../../modules/nrfx/hal/nrf_twim.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_twi.h \
+ ../../../../../../modules/nrfx/hal/nrf_twi.h ../../../include/lis3dh.h \
+ ../../../include/board_basic.h \
  ../../../../../../components/libraries/experimental_log/nrf_log.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
  ../../../../../../components/libraries/strerror/nrf_strerror.h \
@@ -123,6 +127,11 @@ _build/nrf52832_xxaa/main.c.o: ../../../main.c \
  ../../../../../../components/libraries/experimental_log/nrf_log_instance.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_types.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_types.h \
+ ../../../../../../components/libraries/delay/nrf_delay.h \
+ ../../../../../../external/segger_rtt/SEGGER_RTT.h \
+ ../../../../../../external/segger_rtt/SEGGER_RTT_Conf.h \
+ ../../../../../../modules/nrfx/hal/nrf_uart.h \
+ ../../../../../../modules/nrfx/hal/nrf_uarte.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_ctrl.h \
  ../../../../../../components/libraries/experimental_log/src/nrf_log_ctrl_internal.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_backend_interface.h \
@@ -362,9 +371,19 @@ _build/nrf52832_xxaa/main.c.o: ../../../main.c \
 
 ../../../../../../components/libraries/pwr_mgmt/nrf_pwr_mgmt.h:
 
-../../../../../../modules/nrfx/hal/nrf_uart.h:
+../../../../../../integration/nrfx/legacy/nrf_drv_twi.h:
 
-../../../../../../modules/nrfx/hal/nrf_uarte.h:
+../../../../../../modules/nrfx/drivers/include/nrfx_twim.h:
+
+../../../../../../modules/nrfx/hal/nrf_twim.h:
+
+../../../../../../modules/nrfx/drivers/include/nrfx_twi.h:
+
+../../../../../../modules/nrfx/hal/nrf_twi.h:
+
+../../../include/lis3dh.h:
+
+../../../include/board_basic.h:
 
 ../../../../../../components/libraries/experimental_log/nrf_log.h:
 
@@ -379,6 +398,16 @@ _build/nrf52832_xxaa/main.c.o: ../../../main.c \
 ../../../../../../components/libraries/experimental_log/nrf_log_types.h:
 
 ../../../../../../components/libraries/experimental_log/nrf_log_types.h:
+
+../../../../../../components/libraries/delay/nrf_delay.h:
+
+../../../../../../external/segger_rtt/SEGGER_RTT.h:
+
+../../../../../../external/segger_rtt/SEGGER_RTT_Conf.h:
+
+../../../../../../modules/nrfx/hal/nrf_uart.h:
+
+../../../../../../modules/nrfx/hal/nrf_uarte.h:
 
 ../../../../../../components/libraries/experimental_log/nrf_log_ctrl.h:
 

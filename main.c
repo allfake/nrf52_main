@@ -68,6 +68,10 @@
 #include "app_util_platform.h"
 #include "bsp_btn_ble.h"
 #include "nrf_pwr_mgmt.h"
+#include "nrf_drv_twi.h"
+#include "lis3dh.h"
+#include "board_basic.h"
+
 
 #if defined (UART_PRESENT)
 #include "nrf_uart.h"
@@ -104,11 +108,14 @@
 #define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
 #define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
 
+#define LIS3DH_INTERVAL                 APP_TIMER_TICKS(2000)                   
 
 BLE_NUS_DEF(m_nus, NRF_SDH_BLE_TOTAL_LINK_COUNT);                                   /**< BLE NUS service instance. */
 NRF_BLE_GATT_DEF(m_gatt);                                                           /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                             /**< Context for the Queued Write module.*/
 BLE_ADVERTISING_DEF(m_advertising);                                                 /**< Advertising module instance. */
+
+APP_TIMER_DEF(lis3dh_timer);
 
 static uint16_t   m_conn_handle          = BLE_CONN_HANDLE_INVALID;                 /**< Handle of the current connection. */
 static uint16_t   m_ble_nus_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3;            /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
@@ -134,11 +141,25 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
 
+static void lis3dh_handler(void * p_context)
+{
+    int x;
+    int y;
+    int z;
+    get_lis3dh_data(&x,&y,&z);
+    NRF_LOG_INFO("acceleration x,y,z = %d,%d,%d\r\n",x,y,z);
+}
+
 /**@brief Function for initializing the timer module.
  */
 static void timers_init(void)
 {
     ret_code_t err_code = app_timer_init();
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_create(&lis3dh_timer,
+                            APP_TIMER_MODE_REPEATED,
+                            lis3dh_handler);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -683,6 +704,33 @@ static void advertising_start(void)
     APP_ERROR_CHECK(err_code);
 }
 
+/**@brief Function for starting application timers.
+ */
+static void application_timers_start(void)
+{
+    ret_code_t err_code;
+    err_code = app_timer_start(lis3dh_timer, LIS3DH_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
+}
+
+static void sensors_init()
+{
+    uint32_t ret = 0;
+    nrf_gpio_cfg_sense_input(LIS3DH_INT1_PIN, NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);    
+    ret = lis3dh_twi_init();
+
+    if(ret != NRF_SUCCESS)
+    {
+        NRF_LOG_INFO( "lis3dh_twi_init fail %d\r\n", ret);
+    }
+
+    ret = lis3dh_init();
+    if(ret < 0)
+    {
+        NRF_LOG_INFO( "lis3dh_init fail\r\n");
+    }
+}
+
 
 /**@brief Application main function.
  */
@@ -691,37 +739,29 @@ int main(void)
     bool erase_bonds;
     log_init();
 
-    NRF_LOG_INFO("1.");
-
     // Initialize.
     uart_init();
-    NRF_LOG_INFO("2.");
 
     timers_init();
-    NRF_LOG_INFO("3.");
     buttons_leds_init(&erase_bonds);
     power_management_init();
-    NRF_LOG_INFO("4.");
     ble_stack_init();
-    NRF_LOG_INFO("5.");
     gap_params_init();
-    NRF_LOG_INFO("6.");
     gatt_init();
-    NRF_LOG_INFO("7.");
     services_init();
-    NRF_LOG_INFO("8.");
     advertising_init();
-    NRF_LOG_INFO("9.");
 
     conn_params_init();
-    NRF_LOG_INFO("10.");
 
+    sensors_init();
 
     // Start execution.
     printf("\r\nUART started.\r\n");
     NRF_LOG_INFO("Debug logging for UART over RTT started.");
     advertising_start();
     NRF_LOG_INFO("advertising_start started.");
+
+    application_timers_start();
 
     // Enter main loop.
     for (;;)
